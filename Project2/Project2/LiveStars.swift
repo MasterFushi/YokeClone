@@ -24,7 +24,7 @@ struct LiveStars: View {
                 VStack() {
                     HStack() {
                         Spacer()
-                        Text(name).foregroundColor(.white).font(.system(size: 16, weight: .bold)).padding(.trailing)
+                        Text(secondWord(value: name)).font(Font.custom("BebasNeue-Regular", size: 24)).padding(.leading).foregroundColor(.white).font(.system(size: 16, weight: .bold)).padding(.trailing)
                         Image(systemName: "bolt.circle.fill").foregroundColor(.orange).padding(.trailing, 7)
                     }.padding(.top, 5)
                     Spacer()
@@ -34,13 +34,25 @@ struct LiveStars: View {
                 }
             }.frame(width: 150, height: 35)
         }.sheet(isPresented: $showingDetail) {
-            StarProfile(name: self.name)
+            StarProfile(name: self.name, showingDetail: self.$showingDetail)
         }
     }
 }
 
+func secondWord(value: String) -> String {
+    // Find index of space.
+    if let space = value.firstIndex(of: " ") {
+        // Return String.
+        // ... Use "after" to avoid including the space.
+        //     Use String() to for Swift 4.
+        return String(value[value.index(after: space)..<value.endIndex])
+    }
+    return ""
+}
+
+
 struct LiveStars_Previews: PreviewProvider {
     static var previews: some View {
-        LiveStars(name: "Chiozza")
+        LiveStars(name: "Devin Robinson")
     }
 }

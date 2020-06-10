@@ -10,57 +10,69 @@ import SwiftUI
 
 struct ContentView: View {
     init() {
-        UINavigationBar.appearance().backgroundColor = .systemBlue
+        UINavigationBar.appearance().backgroundColor = UIColor(red: 0, green: 0, blue: 0.4, alpha: 1)
+        UINavigationBar.appearance().largeTitleTextAttributes = [
+            .foregroundColor: UIColor.white
+        ]
     }
     
-    @State var jsonData = [StarData]()
+    @State var offlineStars = [StarData]()
+    @State var onlineStars = [StarData]()
     @State var isLoaded = 0;
+    @State var buttonLoaded = false;
     
     var body: some View {
         NavigationView() {
             if(isLoaded >= 0) {
-            ZStack(alignment: .top) {
-                
-                ScrollView() {
-                        Text("LIVE NOW")
-                        ScrollView([.horizontal, .vertical]) {
-                            HStack() {
-                                ForEach(jsonData, id:
-                                \.name) { i in
-                                    //if(i.isOnline) {
-                                        LiveStars(name: i.name)
-                                    //}
+                ZStack(alignment: .top) {
+                    //By putting this line right here, it reloads the data when the json var is filled
+                    if !offlineStars.isEmpty || !onlineStars.isEmpty{
+                        ScrollView() {
+                            VStack(alignment: .leading) {
+                                Text("LIVE NOW").font(Font.custom("BebasNeue-Regular", size: 33)).padding(.leading)
+                            //showsIndicators: false hides the little scroll bar at the bottom
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                    HStack() {
+                                        ForEach(onlineStars, id:
+                                        \.name) { i in
+                                            LiveStars(name: i.name).frame(height: 250)
+                                        }
+                                        Spacer().frame(height: 250)
+                                    }
+                            }
+                            
+                            Text("TRENDING").font(Font.custom("BebasNeue-Regular", size: 33)).padding(.leading)
+                            ScrollView(.horizontal) {
+                                    HStack() {
+                                        ForEach(offlineStars, id:
+                                        \.name) { i in
+                                            FeaturedStars(name: i.name).frame(height: 250)
+                                        }
+                                    }
                                 }
                             }
                         }
-                        Text("TRENDING")
-                        ScrollView([.horizontal, .vertical]) {
-                            HStack() {
-                                ForEach(jsonData, id:
-                                \.name) { i in
-                                    //if(!i.isOnline) {
-                                        FeaturedStars(name: i.name)
-                                    //}
-                                }
-                            }
-                        }
+                    }
+                    Button(action: {
+                        self.parse()
+                        self.buttonLoaded.toggle()
+                    }) {
+                        Text("Press To Load")
+                    //This makes the button "stick" to the bottom of the screen
+                        }.frame(maxHeight: .infinity, alignment: .bottom).disabled(buttonLoaded)
                 }
-                Button(action: {
-                    self.parse()
-                    print("pressed")
-                }) {
-                    Text("Press To Load")
-                }
+                .navigationBarTitle("YOKE", displayMode: .large)
             }
             
-            .navigationBarTitle("YOKE")
-            }
-            
-        }
+        }.edgesIgnoringSafeArea(.all)
     }
     
-    func addStar(star: StarData) {
-        jsonData.append(star)
+    func addStar(star: StarData, isOnline: Bool) {
+        if(isOnline) {
+            onlineStars.append(star)
+        } else {
+            offlineStars.append(star)
+        }
     }
     
     func parse() {
@@ -83,9 +95,9 @@ struct ContentView: View {
                             }
                             for content in sData {
                                 let newStar = StarData(name: content["name"] as! String, bio: content["bio"] as! String, isOnline: content["isOnline"] as! Bool)
-                                print(newStar)
+                                //print(newStar)
                                 self.isLoaded += 1
-                                self.addStar(star: newStar)
+                                self.addStar(star: newStar, isOnline: newStar.isOnline)
                             }
                             
                           } catch let parsingError {
@@ -97,6 +109,7 @@ struct ContentView: View {
         }
     }
 }
+
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {

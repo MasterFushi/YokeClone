@@ -15,6 +15,8 @@ struct StarProfile: View {
     
     var name: String
     
+    @Binding var showingDetail: Bool
+    
     var body: some View {
         GeometryReader { geo in
             ZStack (){
@@ -22,11 +24,12 @@ struct StarProfile: View {
                     VStack() {
                         HStack() {
                             Button(action: {
+                                self.showingDetail.toggle()
                             }) {
                                 Image(systemName: "xmark").foregroundColor(.white)
                                 }.font(.headline).padding()
                             Spacer()
-                            Text(self.name).foregroundColor(.white).font(.system(size: 25, weight: .bold)).frame(width: 150,alignment: .center).multilineTextAlignment(.center)
+                            Text(self.name).font(Font.custom("BebasNeue-Regular", size: 28)).foregroundColor(.white).frame(width: 20,alignment: .center).multilineTextAlignment(.center)
                             Spacer()
                             Image(systemName: "square.and.arrow.up").foregroundColor(.white).font(.headline)
                             Image(systemName: "star").foregroundColor(.white).font(.headline).padding(5)
@@ -45,11 +48,5 @@ struct StarProfile: View {
                     }.frame(width: geo.size.width, height: geo.size.height)
                 }
             }
-    }
-}
-
-struct StarProfile_Previews: PreviewProvider {
-    static var previews: some View {
-        StarProfile(name: "Devin Robinson")
     }
 }
